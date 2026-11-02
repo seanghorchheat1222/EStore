@@ -7,12 +7,14 @@ use App\Models\Order;
 use App\Models\OrderItem;
 use App\Models\Payment;
 use App\Models\Product;
+use App\Models\Shipping;
 use App\Services\PaywayPaymentService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
 class OrderController extends Controller
-{
+{   
+
     public function order(Request $request, PaywayPaymentService $paywaypayment)
     {
         return DB::transaction(function () use ($request, $paywaypayment) {
@@ -91,6 +93,16 @@ class OrderController extends Controller
 
             if ($request->type_order === "online") {
 
+                $request->validate([
+                    'name'  => 'required|string',
+                    'email' => 'required|email',
+                    'phone_number' => 'required|string',
+                    'country' => 'required|string',
+                    'address' => 'required|string',
+                    'city' => 'required|string',
+                    'postal_code' => 'required|string',
+                ]);
+
                 $createPayway = $paywaypayment->createPayment($order);
 
                 $payment = new Payment();
@@ -102,18 +114,30 @@ class OrderController extends Controller
 
                 $payment->load('order');
 
-                // save shippings
+                $shipping = new Shipping();
+                 
+                $shipping->order_id = $order->id;
+                $shipping->name = $request->name;
+                $shipping->email = $request->email;
+                $shipping->phone_number = $request->phone_number;
+                $shipping->country = $request->country;
+                $shipping->address = $request->address;
+                $shipping->city = $request->city;
+                $shipping->postal_code = $request->postal_code;
+                
+                $shipping->save();
 
                 $payment = [
                     'payment' => $payment,
-                    'createPayway' => $createPayway
+                    'createPayway' => $createPayway,
+                    'shipping' => $shipping
                 ];
 
             
 
                 return response()->json([
                     "status" => true,
-                    "order" => $payment,
+                    "data" => $payment,
                     "message" => "Order successfully!",
                 ], 201);
 

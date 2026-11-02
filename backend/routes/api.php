@@ -8,6 +8,7 @@ use App\Http\Controllers\ProductColorController;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\ProductImageController;
 use App\Http\Controllers\ProductSizeController;
+use App\Http\Controllers\RecordController;
 use App\Http\Controllers\SettingController;
 use App\Http\Controllers\UserController;
 use Illuminate\Http\Request;
@@ -26,7 +27,6 @@ Route::middleware(['auth:sanctum', 'can:admin'])->group(function () {
     });
 
     Route::prefix('brand')->group(function () {
-        Route::get('/list_brand', [BrandController::class, "listBrand"]);
         Route::post('/create_brand', [BrandController::class, "createBrand"]);
         Route::get('/show_brand/{id}', [BrandController::class, "showBrand"]);
         Route::put('/update_brand/{id}', [BrandController::class, "updateBrand"]);
@@ -34,7 +34,6 @@ Route::middleware(['auth:sanctum', 'can:admin'])->group(function () {
     });
 
     Route::prefix('category')->group(function () {
-        Route::get('/list_category', [CategoryController::class, "listCategory"]);
         Route::post('/create_category', [CategoryController::class, "createCategory"]);
         Route::get('/show_category/{id}', [CategoryController::class, "showCategory"]);
         Route::put('/update_category/{id}', [CategoryController::class, "updateCategory"]);
@@ -43,7 +42,6 @@ Route::middleware(['auth:sanctum', 'can:admin'])->group(function () {
 
     Route::prefix('product')->group(function () {
         Route::post('/create_product', [ProductController::class, "createProduct"]);
-        Route::get('/show_product/{id}', [ProductController::class, "showProduct"]);
         Route::put('/update_product/{id}', [ProductController::class, "updateProduct"]);
         Route::delete('/delete_product/{id}', [ProductController::class, "deleteProduct"]);
     });
@@ -60,6 +58,10 @@ Route::middleware(['auth:sanctum', 'can:admin'])->group(function () {
         Route::delete('/delete_productimage/{id}', [ProductImageController::class, 'deleteProductImage']);
     });
 
+    Route::prefix('record')->group(function () {
+        Route::get('/list_record', [RecordController::class, 'listRecord']);
+        Route::get('/show_record/{id}', [RecordController::class, 'showRecord']);
+    });
 
 });
 
@@ -77,11 +79,20 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::post('/set_setting', [SettingController::class, 'setSetting']);
     });
 
-    Route::prefix('product')->group(function () {
-        Route::get('/list_product', [ProductController::class, "listProduct"]);
+    Route::prefix('brand')->group(function () {
+        Route::get('/list_brand', [BrandController::class, "listBrand"]);
     });
 
-    Route::prefix('order')->group(function() {
+    Route::prefix('category')->group(function () {
+        Route::get('/list_category', [CategoryController::class, "listCategory"]);
+    });
+
+    Route::prefix('product')->group(function () {
+        Route::get('/list_product', [ProductController::class, "listProduct"]);
+        Route::get('/show_product/{id}', [ProductController::class, "showProduct"]);
+    });
+
+    Route::prefix('order')->group(function () {
         Route::post('/order', [OrderController::class, 'order']);
     });
 });
