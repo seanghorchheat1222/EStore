@@ -21,17 +21,17 @@ class Product extends Model
         return $this->hasOne(Inventory::class);
     }
 
-    public function productSize()
+    public function productSizes()
     {
         return $this->hasMany(ProductSize::class);
     }
 
-    public function productColor()
+    public function productColors()
     {
         return $this->hasMany(ProductColor::class);
     }
 
-    public function productImage()
+    public function productImages()
     {
         return $this->hasMany(ProductImage::class);
     }

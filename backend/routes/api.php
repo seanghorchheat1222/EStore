@@ -3,7 +3,11 @@
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\BrandController;
 use App\Http\Controllers\CategoryController;
+use App\Http\Controllers\OrderController;
+use App\Http\Controllers\ProductColorController;
 use App\Http\Controllers\ProductController;
+use App\Http\Controllers\ProductImageController;
+use App\Http\Controllers\ProductSizeController;
 use App\Http\Controllers\SettingController;
 use App\Http\Controllers\UserController;
 use Illuminate\Http\Request;
@@ -39,7 +43,23 @@ Route::middleware(['auth:sanctum', 'can:admin'])->group(function () {
 
     Route::prefix('product')->group(function () {
         Route::post('/create_product', [ProductController::class, "createProduct"]);
+        Route::get('/show_product/{id}', [ProductController::class, "showProduct"]);
+        Route::put('/update_product/{id}', [ProductController::class, "updateProduct"]);
+        Route::delete('/delete_product/{id}', [ProductController::class, "deleteProduct"]);
     });
+
+    Route::prefix('productcolor')->group(function () {
+        Route::delete('/delete_productcolor/{id}', [ProductColorController::class, 'deleteProductColor']);
+    });
+
+    Route::prefix('productsize')->group(function () {
+        Route::delete('/delete_productsize/{id}', [ProductSizeController::class, 'deleteProductSize']);
+    });
+
+    Route::prefix('productimage')->group(function () {
+        Route::delete('/delete_productimage/{id}', [ProductImageController::class, 'deleteProductImage']);
+    });
+
 
 });
 
@@ -59,6 +79,10 @@ Route::middleware('auth:sanctum')->group(function () {
 
     Route::prefix('product')->group(function () {
         Route::get('/list_product', [ProductController::class, "listProduct"]);
+    });
+
+    Route::prefix('order')->group(function() {
+        Route::post('/order', [OrderController::class, 'order']);
     });
 });
 
