@@ -79,22 +79,23 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::post('/set_setting', [SettingController::class, 'setSetting']);
     });
 
-    Route::prefix('brand')->group(function () {
-        Route::get('/list_brand', [BrandController::class, "listBrand"]);
-    });
-
-    Route::prefix('category')->group(function () {
-        Route::get('/list_category', [CategoryController::class, "listCategory"]);
-    });
-
-    Route::prefix('product')->group(function () {
-        Route::get('/list_product', [ProductController::class, "listProduct"]);
-        Route::get('/show_product/{id}', [ProductController::class, "showProduct"]);
-    });
-
     Route::prefix('order')->group(function () {
         Route::post('/order', [OrderController::class, 'order']);
     });
+});
+
+
+Route::prefix('brand')->group(function () {
+    Route::get('/list_brand', [BrandController::class, "listBrand"]);
+});
+
+Route::prefix('category')->group(function () {
+    Route::get('/list_category', [CategoryController::class, "listCategory"]);
+});
+
+Route::prefix('product')->group(function () {
+    Route::get('/list_product', [ProductController::class, "listProduct"]);
+    Route::get('/show_product/{id}', [ProductController::class, "showProduct"]);
 });
 
 Route::prefix('user')->group(function () {
