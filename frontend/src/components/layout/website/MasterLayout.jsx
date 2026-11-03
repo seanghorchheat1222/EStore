@@ -6,9 +6,9 @@ import Footer from './Footer'
 function MasterLayout() {
   return (
     <>
-      <div className='px-2 md:px-10 w-full'>
+      <div >
         <Header></Header>
-        <main>
+        <main className='px-2 md:px-10 w-full min-h-screen'>
           <Outlet></Outlet>
         </main>
         <Footer></Footer>

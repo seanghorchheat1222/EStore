@@ -1,8 +1,11 @@
-import React from 'react'
+import { Navigate, Outlet } from 'react-router-dom'
 
 function Auth() {
+  const token = { token: "12313132" }
+  const user = { role: "admin" }
+
   return (
-    <div>Auth</div>
+    token?.token && user.role === "admin" ? <Outlet></Outlet> : <Navigate to="/"></Navigate>
   )
 }
 

@@ -21,11 +21,11 @@ function Signin() {
           <form action="" className='mt-7'>
             <div className='flex gap-1 flex-col'>
               <label htmlFor="">Email*</label>
-              <input type="text" placeholder='email@example.com' className='placeholder:text-[#363636] h-11 border-2 border-[#E9E9E9] outline-0 pl-5 rounded-full' />
+              <input type="text" placeholder='email@example.com' className='placeholder:text-[#363636] h-11 border-2 border-[#E9E9E9] outline-0 pl-5 rounded-full focus:border-[#040404]' />
             </div>
             <div className='flex gap-1 flex-col mt-4'>
               <label htmlFor="">Password*</label>
-              <input type="password" placeholder='***************' className='placeholder:text-[#363636] h-11 border-2 border-[#E9E9E9] outline-0 pl-5 rounded-full' />
+              <input type="password" placeholder='password' className='placeholder:text-[#363636] h-11 border-2 border-[#E9E9E9] outline-0 pl-5 rounded-full focus:border-[#040404]' />
             </div>
 
             <div className='flex justify-between items-center mt-4'>
@@ -60,7 +60,7 @@ function Signin() {
         </div>
       </div>
 
-      <button className='cursor-pointer bg-transparent w-max justify-center items-center rounded-full shrink-0 flex font-semibold underline underline-offset-2 absolute top-4 left-4' type='button' onClick={() => toHome()}>
+      <button className='cursor-pointer bg-transparent w-max justify-center items-center rounded-full shrink-0 flex font-semibold underline underline-offset-2 absolute top-4 left-2 md:left-4' type='button' onClick={() => toHome()}>
         Go back
       </button>
     </>

@@ -1,9 +1,6 @@
-import React from 'react'
+function AuthSession({children}) {
 
-function AuthSession() {
-  return (
-    <div>AuthSession</div>
-  )
+  return children
 }
 
 export default AuthSession
