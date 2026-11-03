@@ -4,10 +4,20 @@ import FavoriteIcon from '../../ui/FavoriteIcon'
 import CartIcon from '../../ui/CartIcon'
 import ProfileIcon from '../../ui/ProfileIcon'
 import SearchIcon from '../../ui/SearchIcon'
+import LogoutIcon from '../../ui/LogoutIcon'
+import SettingIcon from '../../ui/SettingIcon'
+import { useDispatch, useSelector } from 'react-redux'
+import { clearToken } from '../../../store/tokenSlice'
+import { clearUser } from '../../../store/userSlice'
+import { signout } from '../../../services/website/header'
 
 function Header() {
   const navigate = useNavigate();
   const [isMenu, setIsMenu] = useState(false);
+  const token = useSelector((state) => state.token)
+  const user = useSelector((state) => state.user)
+  const [isloading, setIsLoading] = useState(false)
+  const dispatch = useDispatch();
 
   const navs = [
     {
@@ -27,6 +37,19 @@ function Header() {
     }
   ]
 
+  useEffect(() => {
+    if (isMenu === true) {
+      document.body.style.overflow = "hidden"
+    } else {
+      document.body.style.overflow = "auto"
+    }
+  }, [isMenu])
+
+  const toggleMenu = () => {
+    setIsMenu(!isMenu)
+  }
+
+
   const toFavorite = () => {
     navigate('/favorite')
   }
@@ -40,17 +63,22 @@ function Header() {
     navigate('/signin')
   }
 
-  useEffect(() => {
-    if (isMenu === true) {
-      document.body.style.overflow = "hidden"
-    } else {
-      document.body.style.overflow = "auto"
+  const onSignout = async () => {
+    try {
+      setIsLoading(true)
+      const response = await signout(token.token)
+      if (response.status === 204) {
+        dispatch(clearUser())
+        dispatch(clearToken());
+        navigate('/')
+      }
+    } catch (err) {
+      console.log(err)
+    } finally {
+      setIsLoading(false)
     }
-  }, [isMenu])
-
-  const toggleMenu = () => {
-    setIsMenu(!isMenu)
   }
+
 
 
   return (
@@ -100,14 +128,44 @@ function Header() {
             </div>
           </button>
 
-          <button className='cursor-pointer bg-[#040404] w-11 h-11 flex justify-center items-center rounded-full shrink-0' type='button' onClick={() => toProfile()}>
-            <NavLink>
-              <div className='w-4 h-4'>
-                <ProfileIcon className={"fill-[#FFFFFF] w-full h-full"}>
-                </ProfileIcon>
-              </div>
-            </NavLink>
-          </button>
+          {
+            token?.token && user.role === "admin"
+              ?
+              <button className='cursor-pointer bg-[#040404] w-11 h-11 justify-center items-center rounded-full shrink-0 flex' type='button' onClick={() => onSignout()}>
+                {
+                  isloading ? <div className='h-7 w-7 rounded-full relative'>
+                    <div className='h-full w-full border-3 border-[rgba(255,255,255,0.50)] rounded-full absolute top-0 left-0 z-1'></div>
+                    <div className='h-full w-full border-l-3 border-t-3  border-[rgba(255,255,255,100)] rounded-full absolute top-0 left-0 animate-spin z-2'></div>
+                  </div> : <NavLink>
+                    <div className='w-4 h-4'>
+                      <LogoutIcon className={"fill-[#FFFFFF] w-full h-full"}>
+                      </LogoutIcon>
+                    </div>
+                  </NavLink>
+                }
+              </button>
+              :
+              token?.token && user.role === "user"
+                ?
+                <button className='cursor-pointer bg-[#040404] w-11 h-11 flex justify-center items-center rounded-full shrink-0' type='button'>
+                  <NavLink>
+                    <div className='w-4 h-4'>
+                      <SettingIcon className={"fill-[#FFFFFF] w-full h-full"}>
+                      </SettingIcon>
+                    </div>
+                  </NavLink>
+                </button>
+                :
+                <button className='cursor-pointer bg-[#040404] w-11 h-11 flex justify-center items-center rounded-full shrink-0' type='button' onClick={() => toProfile()}>
+                  <NavLink>
+                    <div className='w-4 h-4'>
+                      <ProfileIcon className={"fill-[#FFFFFF] w-full h-full"}>
+                      </ProfileIcon>
+                    </div>
+                  </NavLink>
+                </button>
+          }
+
         </div>
       </div>
 

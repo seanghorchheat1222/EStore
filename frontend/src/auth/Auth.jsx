@@ -1,9 +1,10 @@
+import { useSelector } from 'react-redux'
 import { Navigate, Outlet } from 'react-router-dom'
 
 function Auth() {
-  const token = { token: "12313132" }
-  const user = { role: "admin" }
-
+  const user = useSelector((state) => state.user);
+  const token = useSelector((state) => state.token);
+  
   return (
     token?.token && user.role === "admin" ? <Outlet></Outlet> : <Navigate to="/"></Navigate>
   )

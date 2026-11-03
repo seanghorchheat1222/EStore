@@ -8,10 +8,18 @@ import ProfileIcon from "../../ui/ProfileIcon";
 import SettingIcon from "../../ui/SettingIcon";
 import BrandIcon from "../../ui/BrandIcon";
 import LogoutIcon from "../../ui/LogoutIcon";
+import { useDispatch, useSelector } from "react-redux";
+import { useState } from "react";
+import { signout } from "../../../services/system/sidebar";
+import { clearUser } from "../../../store/userSlice";
+import { clearToken } from "../../../store/tokenSlice";
 
 function Sidebar() {
   const navigate = useNavigate();
   const location = useLocation();
+  const [isloading, setIsLoading] = useState(false)
+  const token = useSelector((state) => state.token)
+  const disPatch = useDispatch();
 
   const toPage = (path) => {
     navigate(path)
@@ -65,6 +73,22 @@ function Sidebar() {
     }
   ]
 
+  const onSignout = async () => {
+    try {
+      setIsLoading(true)
+      const response = await signout(token.token)
+      if (response.status === 204) {
+        disPatch(clearUser())
+        disPatch(clearToken());
+        navigate('/')
+      }
+    } catch (err) {
+      console.log(err)
+    } finally {
+      setIsLoading(false)
+    }
+  }
+
 
 
   return (
@@ -97,13 +121,20 @@ function Sidebar() {
         </div>
 
         <div className="justify-center flex flex-col items-center w-full h-20 shrink-0">
-          <button className='cursor-pointer bg-[#040404] w-11 h-11 justify-center items-center rounded-full shrink-0 flex' type='button'>
-            <NavLink>
-              <div className='w-4 h-4'>
-                <LogoutIcon className={"fill-[#FFFFFF] w-full h-full"}>
-                </LogoutIcon>
-              </div>
-            </NavLink>
+          <button className='cursor-pointer bg-[#040404] w-11 h-11 justify-center items-center rounded-full shrink-0 flex' type='button' onClick={() => onSignout()}>
+            {
+              isloading ? <div className='h-7 w-7 rounded-full relative'>
+                <div className='h-full w-full border-3 border-[rgba(255,255,255,0.50)] rounded-full absolute top-0 left-0 z-1'></div>
+                <div className='h-full w-full border-l-3 border-t-3  border-[rgba(255,255,255,100)] rounded-full absolute top-0 left-0 animate-spin z-2'></div>
+              </div> : 
+              <NavLink>
+                <div className='w-4 h-4'>
+                  <LogoutIcon className={"fill-[#FFFFFF] w-full h-full"}>
+                  </LogoutIcon>
+                </div>
+              </NavLink>
+            }
+
           </button>
         </div>
       </div>

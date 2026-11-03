@@ -10,7 +10,7 @@ function NotFound() {
   }
   return (
     <>
-      <div className='flex justify-center w-full h-screen items-center flex-col gap-2'>
+      <div className='flex justify-center w-full h-screen items-center flex-col gap-4'>
         <div>
           Page <span className='underline underline-offset-2'>{location.pathname.replace("/" , "")}</span>, Not Found!
         </div>

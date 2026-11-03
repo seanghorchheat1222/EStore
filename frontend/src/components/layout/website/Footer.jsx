@@ -4,7 +4,7 @@ import { NavLink } from 'react-router-dom'
 function Footer() {
   return (
     <>
-      <div className='bg-[#E9E9E9] py-10 px-2 md:px-10'>
+      <div className='bg-[#E9E9E9] py-5 px-2 md:px-10'>
         <div>
           <div className='text-[#363636]'>INFO</div>
           <div className='mt-5'>
@@ -22,7 +22,7 @@ function Footer() {
           </div>
         </div>
 
-        <div className='mt-10'>
+        <div className='mt-5'>
           <div className='text-[#363636]'>LANGUAGES</div>
           <div className='flex flex-col items-start mt-5'>
             <button>ENG</button>

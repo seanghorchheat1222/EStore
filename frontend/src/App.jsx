@@ -20,6 +20,7 @@ import Record from './pages/system/Record'
 import User from './pages/system/User'
 import Setting from './pages/system/Setting'
 import Shipping from './pages/system/Shipping'
+import Signup from './auth/Signup'
 
 function App() {
   return (
@@ -53,6 +54,7 @@ function App() {
           <Route path="*" element={<NotFound></NotFound>}></Route>
 
           <Route path='/signin' element={<Signin></Signin>}></Route>
+          <Route path='/signup' element={<Signup></Signup>}></Route>
 
         </Routes>
       </BrowserRouter>

@@ -13,14 +13,19 @@ import ProfileIcon from "../../ui/ProfileIcon";
 import SettingIcon from "../../ui/SettingIcon";
 import BrandIcon from "../../ui/BrandIcon";
 import LogoutIcon from "../../ui/LogoutIcon";
-
+import { useDispatch, useSelector } from 'react-redux'
+import { signout } from '../../../services/system/header'
+import { clearUser } from '../../../store/userSlice'
+import { clearToken } from '../../../store/tokenSlice'
 
 function Header() {
-
   const navigate = useNavigate();
   const location = useLocation();
-  const [isMenu, setIsMenu] = useState(false);
-
+  const [isMenu, setIsMenu] = useState(false);;
+  const [isloading, setIsLoading] = useState(false)
+  const token = useSelector((state) => state.token)
+  const disPatch = useDispatch();
+  
   const toPage = (path) => {
     navigate(path)
   }
@@ -77,11 +82,27 @@ function Header() {
     setIsMenu(!isMenu)
   }
 
+  const onSignout = async () => {
+    try {
+      setIsLoading(true)
+      const response = await signout(token.token)
+      if (response.status === 204) {
+        disPatch(clearUser())
+        disPatch(clearToken());
+        navigate('/')
+      }
+    } catch (err) {
+      console.log(err)
+    } finally {
+      setIsLoading(false)
+    }
+  }
+
 
   return (
     <>
       <div className={`fixed w-25 top-0 md:hidden flex flex-col  h-full ${isMenu ? "left-0" : "-left-full"} bg-[rgba(255,255,255,0.50)] backdrop-blur-sm z-10 transition-all duration-300 ease-in-out`}>
-        <div className="h-20 flex md:hidden justify-center items-center shrink-0" onClick={()=> toggleMenu()}>
+        <div className="h-20 flex md:hidden justify-center items-center shrink-0" onClick={() => toggleMenu()}>
           <div className='flex flex-col gap-1.5 cursor-pointer' >
             <span className='inline-block w-10 h-1 bg-[#040404] rounded-full'></span>
             <span className='inline-block w-8 h-1 bg-[#040404] rounded-full'></span>
@@ -108,20 +129,26 @@ function Header() {
         </div>
 
         <div className="justify-center flex flex-col items-center w-full h-20 shrink-0">
-          <button className='cursor-pointer bg-[#040404] w-11 h-11 justify-center items-center rounded-full shrink-0 flex' type='button'>
-            <NavLink>
-              <div className='w-4 h-4'>
-                <LogoutIcon className={"fill-[#FFFFFF] w-full h-full"}>
-                </LogoutIcon>
-              </div>
-            </NavLink>
+          <button className='cursor-pointer bg-[#040404] w-11 h-11 justify-center items-center rounded-full shrink-0 flex' type='button' onClick={() => onSignout()}>
+            {
+              isloading ? <div className='h-7 w-7 rounded-full relative'>
+                <div className='h-full w-full border-3 border-[rgba(255,255,255,0.50)] rounded-full absolute top-0 left-0 z-1'></div>
+                <div className='h-full w-full border-l-3 border-t-3  border-[rgba(255,255,255,100)] rounded-full absolute top-0 left-0 animate-spin z-2'></div>
+              </div> : <NavLink>
+                <div className='w-4 h-4'>
+                  <LogoutIcon className={"fill-[#FFFFFF] w-full h-full"}>
+                  </LogoutIcon>
+                </div>
+              </NavLink>
+            }
+
           </button>
         </div>
       </div>
 
       <div className='flex justify-between h-20 items-center px-2 gap-5 fixed top-0 left-0 w-full bg-[#F4F4F4] pl-2 md:pl-30'>
         <div className='w-full flex items-center gap-4'>
-          <div className="h-20 flex md:hidden justify-center items-center shrink-0" onClick={()=> toggleMenu()}>
+          <div className="h-20 flex md:hidden justify-center items-center shrink-0" onClick={() => toggleMenu()}>
             <div className='flex flex-col gap-1.5 cursor-pointer' >
               <span className='inline-block w-10 h-1 bg-[#040404] rounded-full'></span>
               <span className='inline-block w-8 h-1 bg-[#040404] rounded-full'></span>
@@ -160,9 +187,6 @@ function Header() {
           </button>
         </div>
       </div>
-
-      <Sidebar></Sidebar>
-
 
     </>
 
