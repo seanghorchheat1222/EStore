@@ -93,7 +93,7 @@ function Sidebar() {
 
   return (
     <>
-      <div className={`fixed w-30 md:left-0 top-0 hidden md:flex flex-col h-full`}>
+      <div className={`fixed w-30 md:left-0 top-0 hidden md:flex flex-col h-full z-101`}>
         <div className="h-20 flex justify-center items-center shrink-0">
           <div className='flex flex-col gap-1.5 cursor-pointer' >
             <span className='inline-block w-10 h-1 bg-[#040404] rounded-full'></span>

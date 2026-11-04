@@ -102,7 +102,7 @@ function Header() {
 
   return (
     <>
-      <div className={`fixed w-25 top-0 md:hidden flex flex-col  h-full ${isMenu ? "left-0" : "-left-full"} bg-[rgba(255,255,255,0.50)] backdrop-blur-sm z-10 transition-all duration-300 ease-in-out`}>
+      <div className={` fixed w-25 top-0 md:hidden flex flex-col z-101 h-full ${isMenu ? "left-0" : "-left-full"} bg-[rgba(255,255,255,0.50)] backdrop-blur-sm z-10 transition-all duration-300 ease-in-out`}>
         <div className="h-20 flex md:hidden justify-center items-center shrink-0" onClick={() => toggleMenu()}>
           <div className='flex flex-col gap-1.5 cursor-pointer' >
             <span className='inline-block w-10 h-1 bg-[#040404] rounded-full'></span>
@@ -147,7 +147,7 @@ function Header() {
         </div>
       </div>
 
-      <div className='flex justify-between h-20 items-center px-2 gap-5 fixed top-0 left-0 w-full bg-[#F4F4F4] pl-2 md:pl-30'>
+      <div className='flex justify-between h-20 items-center px-2 gap-5 fixed top-0 left-0 w-full bg-[#F4F4F4] pl-2 md:pl-30 z-100'>
         <div className='w-full flex items-center gap-4'>
           <div className="h-20 flex md:hidden justify-center items-center shrink-0" onClick={() => toggleMenu()}>
             <div className='flex flex-col gap-1.5 cursor-pointer' >

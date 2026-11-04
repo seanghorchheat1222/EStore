@@ -5,6 +5,7 @@ import { currentUser, setSetting, signout } from '../../services/system/setting'
 import LogoutIcon from '../../components/ui/LogoutIcon';
 import { clearUser, setUser } from '../../store/userSlice';
 import { clearToken } from '../../store/tokenSlice';
+import { useNavigate } from 'react-router-dom';
 
 function Setting() {
   const user = useSelector((state) => state.user)
@@ -12,8 +13,9 @@ function Setting() {
   const [isEdit, setIsEdit] = useState(false);
   const [isloading, setIsLoading] = useState(false)
   const [imageInput, setImageInput] = useState(null);
-  const [previewImage, setPreviewImage] = useState(user?.settting?.image !== '' ? `${import.meta.env.VITE_IMAGE_URL}/${user?.setting?.image}` : preProfile)
+  const [previewImage, setPreviewImage] = useState(user?.setting?.image ? `${import.meta.env.VITE_IMAGE_URL}/${user?.setting?.image}` : preProfile)
   const dispatch = useDispatch()
+  const navigate = useNavigate()
 
   const [form, setForm] = useState({
     phone_number: user?.setting?.phone_number,
@@ -97,7 +99,7 @@ function Setting() {
           <div className='w-40 h-40 rounded-full relative flex justify-center items-center'>
             <input type="file" onChange={handleImageInput} className={`absolute w-full h-full rounded-full opacity-0 ${isEdit ? 'block' : 'hidden'} z-10`} />
             <div className={`w-max h-max absolute  ${isEdit ? 'block' : 'hidden'}`}>Select Image*</div>
-            <img src={isEdit ? previewImage : user?.settting?.image !== '' ? `${import.meta.env.VITE_IMAGE_URL}/${user?.setting?.image}` : preProfile} alt="" className='w-full h-full object-cover object-top rounded-full' />
+            <img src={isEdit ? previewImage : user?.setting?.image ? `${import.meta.env.VITE_IMAGE_URL}/${user?.setting?.image}` : preProfile} alt="" className='w-full h-full object-cover object-top rounded-full' />
           </div>
           <div className='mt-2'>
             {user.name}
@@ -155,7 +157,7 @@ function Setting() {
 
             <div className='flex gap-1 mt-2 flex-col'>
               <label htmlFor="">Date birth* </label>
-              <input readOnly={isEdit === false} type="date" className='placeholder:text-[#363636] h-11 border-2 pr-3 outline-0 pl-5 rounded-full border-[#040404]' onChange={handleInput} name="date_birth" value={isEdit ? form.date_birth : new Date(user?.setting?.date_birth).toISOString().split('T')[0]} />
+              <input readOnly={isEdit === false} type="date" className='placeholder:text-[#363636] h-11 border-2 pr-3 outline-0 pl-5 rounded-full border-[#040404]' onChange={handleInput} name="date_birth" value={isEdit ? form.date_birth :  user?.setting?.date_birth ?  new Date(user?.setting?.date_birth).toISOString().split('T')[0] : ''} />
             </div>
 
             <div className='flex gap-1 mt-2 flex-col'>

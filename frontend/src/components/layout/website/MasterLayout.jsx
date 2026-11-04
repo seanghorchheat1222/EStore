@@ -8,7 +8,7 @@ function MasterLayout() {
     <>
       <div >
         <Header></Header>
-        <main className='px-2 md:px-10 w-full min-h-screen'>
+        <main className='px-2 md:px-10 w-full min-h-screen pb-5 pt-5'>
           <Outlet></Outlet>
         </main>
         <Footer></Footer>

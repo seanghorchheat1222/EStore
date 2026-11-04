@@ -59,7 +59,10 @@ function Header() {
   }
 
   const toProfile = () => {
+    navigate('/profile')
+  }
 
+  const toLogin = () => {
     navigate('/signin')
   }
 
@@ -147,7 +150,7 @@ function Header() {
               :
               token?.token && user.role === "user"
                 ?
-                <button className='cursor-pointer bg-[#040404] w-11 h-11 flex justify-center items-center rounded-full shrink-0' type='button'>
+                <button className='cursor-pointer bg-[#040404] w-11 h-11 flex justify-center items-center rounded-full shrink-0' type='button' onClick={() => toProfile()}>
                   <NavLink>
                     <div className='w-4 h-4'>
                       <SettingIcon className={"fill-[#FFFFFF] w-full h-full"}>
@@ -156,7 +159,7 @@ function Header() {
                   </NavLink>
                 </button>
                 :
-                <button className='cursor-pointer bg-[#040404] w-11 h-11 flex justify-center items-center rounded-full shrink-0' type='button' onClick={() => toProfile()}>
+                <button className='cursor-pointer bg-[#040404] w-11 h-11 flex justify-center items-center rounded-full shrink-0' type='button' onClick={() => toLogin()}>
                   <NavLink>
                     <div className='w-4 h-4'>
                       <ProfileIcon className={"fill-[#FFFFFF] w-full h-full"}>
