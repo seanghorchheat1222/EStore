@@ -144,7 +144,7 @@ function Brand() {
                   <tr className='border-2 border-[#040404] h-10 w-full rounded-full'>
                     <th className='font-normal px-5 w-20'>Id*</th>
                     <th className='font-normal px-5 w-20'>Name*</th>
-                    <th className='font-normal px-5 w-100'>Description</th>
+                    <th className='font-normal px-5 w-100 '>Description</th>
                     <th className='font-normal px-5 w-50'>Action</th>
                   </tr>
                 </thead>
@@ -154,7 +154,7 @@ function Brand() {
                       <tr key={brand.id} className='h-15 border-b-2 border-[#040404]'>
                         <td className='text-center px-2'>{brand.id}</td>
                         <td className='text-center px-2'>{brand.name}</td>
-                        <td className='text-center'>{brand.description}</td>
+                        <td className='text-center line-clamp-3'>{brand.description}</td>
                         <td className='px-2'>
                           <div className='flex justify-center items-center gap-2'>
                             <button className='cursor-pointer border border-[#040404] bg-transparent w-max h-8 justify-center items-center rounded-full px-5 shrink-0 flex text-[#363636] font-semibold' type='button' onClick={() => handleShow(brand.id)}>

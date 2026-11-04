@@ -16,7 +16,7 @@ class BrandController extends Controller
         }
         ;
 
-        $data = $query->paginate(5);
+        $data = $query->paginate($request->per_page ?? 5);
 
         return response()->json([
             "status" => true,
