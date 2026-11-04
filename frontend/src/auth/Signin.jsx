@@ -65,6 +65,10 @@ function Signin() {
     navigate('/signup')
   }
 
+  const toResetPassword = () => {
+    navigate('/reset_password')
+  } 
+
   return (
     <>
       <div className='flex w-full h-screen justify-center items-center px-2'>
@@ -92,7 +96,7 @@ function Signin() {
                 <label htmlFor="">Remember me</label>
               </div>
               <div>
-                <button type='button'>
+                <button type='button' onClick={() => toResetPassword()} className='cursor-pointer'>
                   Forget password?
                 </button>
               </div>
@@ -109,8 +113,6 @@ function Signin() {
                     :
                     'Login'
                 }
-
-
               </button>
             </div>
           </form>

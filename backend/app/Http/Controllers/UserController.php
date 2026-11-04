@@ -10,32 +10,34 @@ use Illuminate\Support\Facades\Hash;
 use Mail;
 
 class UserController extends Controller
-{   
-    public function listUser(Request $request){
+{
+    public function listUser(Request $request)
+    {
         $userId = $request->user()->id;
 
         $query = User::where("id", "!=", $userId)->latest();
-        
-        if($request->search){
-            $query = $query->where("name", "LIKE" , '%' . $request->search . '%');
+
+        if ($request->search) {
+            $query = $query->where("name", "LIKE", '%' . $request->search . '%');
         }
 
         $data = $query->paginate(5);
-        
+
         return response([
-         "status" => true,
-         "data"=> $data
+            "status" => true,
+            "data" => $data
         ], 200);
     }
 
-    public function requestOtp(Request $request){
+    public function requestOtp(Request $request)
+    {
         $request->validate([
             "email" => 'required|email'
         ]);
 
         $user = User::where("email", $request->email)->first();
 
-        if($user){
+        if ($user) {
             return response()->json([
                 "status" => false,
                 "message" => "Email already Exit!"
@@ -46,7 +48,7 @@ class UserController extends Controller
 
         Cache::put("otp_" . $request->email, $otp, now()->addMinute());
 
-        Mail::raw("Your OTP is: $otp", function($message) use ($request){ // because anonymouse functoins php not allow to access variable from surrounding scope, so we have to user "use ()"
+        Mail::raw("Your OTP is: $otp", function ($message) use ($request) { // because anonymouse functoins php not allow to access variable from surrounding scope, so we have to user "use ()"
             $message->to($request->email);
             $message->subject("Your OTP from EStore");
         });
@@ -54,10 +56,11 @@ class UserController extends Controller
         return response()->json([
             "status" => true,
             "message" => "OTP sent successfully & expired in 1min!"
-        ], 200);    
+        ], 200);
     }
 
-    public function confirmOtp(Request $request){
+    public function confirmOtp(Request $request)
+    {
         $request->validate([
             "email" => 'required|email',
             "otp" => 'required|digits:6'
@@ -66,18 +69,18 @@ class UserController extends Controller
 
         $otp = Cache::get("otp_" . $request->email);
 
-        if(!$otp){
+        if (!$otp) {
             return response()->json([
                 "status" => false,
                 "message" => "OTP expired or not found!"
             ], 400); # bad request
         }
 
-        if($otp != $request->otp){
-           return response()->json([
-            "status" => false,
-            "message" => "Invalid OTP!"
-           ], 400);
+        if ($otp != $request->otp) {
+            return response()->json([
+                "status" => false,
+                "message" => "Invalid OTP!"
+            ], 400);
         }
 
         cache::forget("otp_" . $request->email);
@@ -88,7 +91,8 @@ class UserController extends Controller
         ], 200);
     }
 
-    public function createUser(Request $request){
+    public function createUser(Request $request)
+    {
         $request->validate([
             "name" => 'required|string|max:100',
             "email" => 'required|email',
@@ -102,7 +106,7 @@ class UserController extends Controller
         $user->password = Hash::make($request->password);
         $user->email_verified_at = Carbon::now();
 
-        if($request->role){
+        if ($request->role) {
             $user->role = $request->role;
         }
 
@@ -115,18 +119,95 @@ class UserController extends Controller
 
     }
 
-     public function resetPassword(Request $request){
+
+    public function requestResetPasswordOtp(Request $request)
+    {
         $request->validate([
-            "password" => 'required|string'
+            "email" => 'required|email'
         ]);
 
-        $userId = $request->user()->only(["id"]);
+        $otp = rand(100000, 999999);
 
-        $user = User::findOrFail($userId)->first();
+        Cache::put("otp_" . $request->email, $otp, now()->addMinute(5));
 
-        $user->password = Hash::make($request->password);
+        Mail::raw("Your OTP for reset password: $otp", function ($message) use ($request) { // because anonymouse functoins php not allow to access variable from surrounding scope, so we have to user "use ()"
+            $message->to($request->email);
+            $message->subject("Your OTP from EStore");
+        });
 
-        $user->save();
+        return response()->json([
+            "status" => true,
+            "message" => "OTP sent successfully & expired in 1min!"
+        ], 200);
+    }
+
+
+    public function confirmResetPasswordOtp(Request $request)
+    {
+        $request->validate([
+            "email" => 'required|email',
+            "otp" => 'required|digits:6'
+        ]);
+
+
+        $otp = Cache::get("otp_" . $request->email);
+
+        if (!$otp) {
+            return response()->json([
+                "status" => false,
+                "message" => "OTP expired or not found!"
+            ], 400); # bad request
+        }
+
+        if ($otp != $request->otp) {
+            return response()->json([
+                "status" => false,
+                "message" => "Invalid OTP!"
+            ], 400);
+        }
+
+        return response()->json([
+            "status" => true,
+            "message" => "Verified OTP successfully!"
+        ], 200);
+    }
+
+    public function resetPassword(Request $request)
+    {
+        $request->validate([
+            "email" => 'required|email',
+            "password" => 'required|string',
+            "otp" => 'required|digits:6'
+        ]);
+
+        $otp = Cache::get("otp_" . $request->email);
+
+        if (!$otp) {
+            return response()->json([
+                "status" => false,
+                "message" => "OTP expired or not found!"
+            ], 400); # bad request
+        }
+
+        if ($otp != $request->otp) {
+            return response()->json([
+                "status" => false,
+                "message" => "Invalid OTP!"
+            ], 400);
+        }
+
+        $user = User::where("email", $request->email);
+
+        if (!$user) {
+            return response()->json([
+                "status" => false,
+                "message" => "Account not exist!"
+            ], 404);
+        }
+
+        $user->update(["password" => Hash::make($request->password)]);
+
+        cache::forget("otp_" . $request->email);
 
         return response()->json([
             "status" => true,
@@ -134,5 +215,5 @@ class UserController extends Controller
         ], 200);
     }
 
-    
+
 }

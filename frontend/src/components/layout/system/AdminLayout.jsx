@@ -6,7 +6,7 @@ function AdminLayout() {
   return (
     <>
       <Header></Header>
-      <main className='pt-20 pl-2 md:pl-30 pr-2'>
+      <main className='pt-20 pl-2 md:pl-30 pr-2 pb-5'>
         <Outlet></Outlet>
       </main>
       <Sidebar></Sidebar>

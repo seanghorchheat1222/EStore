@@ -25,6 +25,7 @@ function Header() {
   const [isloading, setIsLoading] = useState(false)
   const token = useSelector((state) => state.token)
   const disPatch = useDispatch();
+  const user = useSelector((state) => state.user)
   
   const toPage = (path) => {
     navigate(path)
@@ -182,8 +183,8 @@ function Header() {
             </NavLink>
           </button>
 
-          <button className='cursor-pointer bg-[#E9E9E9] w-16 h-16 flex justify-center items-center rounded-full shrink-0' type='button'>
-            <img src={preProfile} className='w-full h-full object-cover object-top rounded-full' alt="" />
+          <button className='cursor-pointer bg-[#E9E9E9] w-15 h-15 flex justify-center items-center rounded-full shrink-0' type='button'>
+            <img src={user?.settting?.image !== '' ? `${import.meta.env.VITE_IMAGE_URL}/${user?.setting?.image}` : preProfile}   className='w-full h-full object-cover object-top rounded-full' alt="" />
           </button>
         </div>
       </div>

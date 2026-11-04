@@ -71,10 +71,6 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::post('/logout', [AuthController::class, "logout"]);
     });
 
-    Route::prefix('user')->group(function () {
-        Route::post('/reset_password', [UserController::class, 'resetPassword']);
-    });
-
     Route::prefix('setting')->group(function () {
         Route::post('/set_setting', [SettingController::class, 'setSetting']);
     });
@@ -102,6 +98,9 @@ Route::prefix('user')->group(function () {
     Route::post('/request_otp', [UserController::class, 'requestOtp']);
     Route::post('/confirm_otp', [UserController::class, 'confirmOtp']);
     Route::post('/create_user', [UserController::class, 'createUser']);
+    Route::post('/request_resetpasswordotp', [UserController::class, 'requestResetPasswordOtp']);
+    Route::post('/confirm_resetpasswordotp', [UserController::class, 'confirmResetPasswordOtp']);
+    Route::post('/reset_password', [UserController::class, 'resetPassword']);
 });
 
 Route::prefix('auth')->group(function () {

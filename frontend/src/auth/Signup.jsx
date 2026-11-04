@@ -1,16 +1,20 @@
 import { useState } from "react";
-import { useDispatch } from "react-redux";
 import { useNavigate } from "react-router-dom";
+import { confirmOtp, createUser, requestOtp } from "../services/auth/signup";
 
 
 function Signup() {
   const navigate = useNavigate();
   const [form, setForm] = useState({
+    name: "",
     email: "",
-    password: ""
+    password: "",
+    otp: ""
   })
-  const dispatch = useDispatch();
+
   const [isloading, setIsLoading] = useState(false)
+  const [isRequestOtp, setIsRequestOtp] = useState(true)
+  const [isconfirmOtp, setIsConfirmOtp] = useState(false)
 
   const handleInput = (e) => {
     const { name, value } = e.target;
@@ -20,18 +24,61 @@ function Signup() {
     })
   }
 
+  const handleRequestOtp = async (e) => {
+    e.preventDefault()
+    try {
+      setIsLoading(true);
+      const response = await requestOtp({email: form.email});
+      if (response.status === 200) {
+        setIsRequestOtp(false)
+        setIsConfirmOtp(true)
+      }
+    } catch (err) {
+      console.log(err)
+    } finally {
+      setIsLoading(false)
+    }
+  }
+
+  const handleConfirmOtp = async (e) => {
+    e.preventDefault()
+    try{
+      setIsLoading(true)
+      const response = await confirmOtp({email: form.email, otp: form.otp})
+      if(response.status === 200){
+        setIsConfirmOtp(false);
+      }
+    }catch(err){
+      console.log(err)
+    }finally{
+      setIsLoading(false)
+    }
+  }
+
+  const toSignIn = () => {
+    navigate('/signin')
+  }
+
   const handleSubmit = async (e) => {
     e.preventDefault()
-
+    try{
+     setIsLoading(true)
+     const response = await createUser({name: form.name, email: form.email, password: form.password})
+     if(response.status === 201){
+       toSignIn()
+     }
+    }catch(err){
+      console.log(err)
+    }finally{
+      setIsLoading(false)
+    }
   }
 
   const toHome = () => {
     navigate('/')
   }
 
-  const toSignIn = () => {
-    navigate('/signin')
-  }
+
 
   return (
     <>
@@ -43,38 +90,118 @@ function Signup() {
           <div className='text-[#363636]'>
             Get every outfit here!
           </div>
-
-          <form action="" className='mt-7'>
-            <div className='flex gap-1 flex-col'>
-              <label htmlFor="">Email*</label>
-              <input required type="text" placeholder='email@example.com' className='placeholder:text-[#363636] h-11 border-2 border-[#E9E9E9] outline-0 pl-5 rounded-full focus:border-[#040404]' name="email" value={form.email} onChange={handleInput} />
-            </div>
-
-            <div className='flex justify-between items-center mt-4'>
-              <div className='flex gap-1 flex-row items-center'>
-
+          {
+            isRequestOtp ? 
+            <form action="" className='mt-7' onSubmit={handleRequestOtp}>
+              <div className='flex gap-1 flex-col'>
+                <label htmlFor="">Email*</label>
+                <input required type="text" placeholder='email@example.com' className='placeholder:text-[#363636] h-11 border-2 border-[#E9E9E9] outline-0 pl-5 rounded-full focus:border-[#040404]' name="email" value={form.email} onChange={handleInput} />
               </div>
-              <div>
-                <button type='button'>
-                  Forget password?
+
+              <div className='flex justify-between items-center mt-4'>
+                <div className='flex gap-1 flex-row items-center'>
+
+                </div>
+                <div>
+                  <button type='button'>
+                    Forget password?
+                  </button>
+                </div>
+              </div>
+
+              <div className='mt-4'>
+                <button className='cursor-pointer bg-[#040404] w-full h-11 justify-center items-center rounded-full shrink-0 flex text-[#FFFFFF] font-semibold' type='submit'>
+                  {
+                    isloading ?
+                      <div className='h-7 w-7 rounded-full relative'>
+                        <div className='h-full w-full border-3 border-[rgba(255,255,255,0.50)] rounded-full absolute top-0 left-0 z-1'></div>
+                        <div className='h-full w-full border-l-3 border-t-3  border-[rgba(255,255,255,100)] rounded-full absolute top-0 left-0 animate-spin z-2'></div>
+                      </div>
+                      :
+                      'Request OTP'
+                  }
                 </button>
               </div>
-            </div>
+            </form> :
 
-            <div className='mt-4'>
-              <button className='cursor-pointer bg-[#040404] w-full h-11 justify-center items-center rounded-full shrink-0 flex text-[#FFFFFF] font-semibold' type='submit'>
-                {
-                  isloading ?
-                    <div className='h-7 w-7 rounded-full relative'>
-                      <div className='h-full w-full border-3 border-[rgba(255,255,255,0.50)] rounded-full absolute top-0 left-0 z-1'></div>
-                      <div className='h-full w-full border-l-3 border-t-3  border-[rgba(255,255,255,100)] rounded-full absolute top-0 left-0 animate-spin z-2'></div>
+
+              isconfirmOtp ?
+
+                <form action="" className='mt-7' onSubmit={handleConfirmOtp}>
+                  <div className='flex gap-1 flex-col'>
+                    <label htmlFor="">Otp*</label>
+                    <input required type="text" placeholder='12345678' className='placeholder:text-[#363636] h-11 border-2 border-[#E9E9E9] outline-0 pl-5 rounded-full focus:border-[#040404]' name="otp" value={form.otp} onChange={handleInput} />
+                  </div>
+
+                  <div className='flex justify-between items-center mt-4'>
+                    <div className='flex gap-1 flex-row items-center'>
+
                     </div>
-                    :
-                    'Request OTP'
-                }
-              </button>
-            </div>
-          </form>
+                    <div>
+                      <button type='button'>
+                        Forget password?
+                      </button>
+                    </div>
+                  </div>
+
+                  <div className='mt-4'>
+                    <button className='cursor-pointer bg-[#040404] w-full h-11 justify-center items-center rounded-full shrink-0 flex text-[#FFFFFF] font-semibold' type='submit'>
+                      {
+                        isloading ?
+                          <div className='h-7 w-7 rounded-full relative'>
+                            <div className='h-full w-full border-3 border-[rgba(255,255,255,0.50)] rounded-full absolute top-0 left-0 z-1'></div>
+                            <div className='h-full w-full border-l-3 border-t-3  border-[rgba(255,255,255,100)] rounded-full absolute top-0 left-0 animate-spin z-2'></div>
+                          </div>
+                          :
+                          'Confirm OTP'
+                      }
+                    </button>
+                  </div>
+                </form>
+                :
+                <form action="" className='mt-7' onSubmit={handleSubmit}>
+                  <div className='flex gap-1 flex-col'>
+                    <label htmlFor="">Name*</label>
+                    <input required type="text" placeholder='username' className='placeholder:text-[#363636] h-11 border-2 border-[#E9E9E9] outline-0 pl-5 rounded-full focus:border-[#040404]' name="name" value={form.name} onChange={handleInput} />
+                  </div>
+                  <div className='flex gap-1 flex-col'>
+                    <label htmlFor="">Email*</label>
+                    <input type="text" readOnly placeholder='email@example.com' className='placeholder:text-[#363636] h-11 border-2 border-[#E9E9E9] outline-0 pl-5 rounded-full focus:border-[#040404]' name="email" value={form.email} onChange={handleInput} />
+                  </div>
+                  <div className='flex gap-1 flex-col'>
+                    <label htmlFor="">Password*</label>
+                    <input required type="text" placeholder='password' className='placeholder:text-[#363636] h-11 border-2 border-[#E9E9E9] outline-0 pl-5 rounded-full focus:border-[#040404]' name="password" value={form.password} onChange={handleInput} />
+                  </div>
+
+                  <div className='flex justify-between items-center mt-4'>
+                    <div className='flex gap-1 flex-row items-center'>
+
+                    </div>
+                    <div>
+                      <button type='button'>
+                        Forget password?
+                      </button>
+                    </div>
+                  </div>
+
+                  <div className='mt-4'>
+                    <button className='cursor-pointer bg-[#040404] w-full h-11 justify-center items-center rounded-full shrink-0 flex text-[#FFFFFF] font-semibold' type='submit'>
+                      {
+                        isloading ?
+                          <div className='h-7 w-7 rounded-full relative'>
+                            <div className='h-full w-full border-3 border-[rgba(255,255,255,0.50)] rounded-full absolute top-0 left-0 z-1'></div>
+                            <div className='h-full w-full border-l-3 border-t-3  border-[rgba(255,255,255,100)] rounded-full absolute top-0 left-0 animate-spin z-2'></div>
+                          </div>
+                          :
+                          'Create account'
+                      }
+                    </button>
+                  </div>
+                </form>
+
+
+          }
+
           <div className='mt-4'>
             <div className='flex gap-2 justify-center'>
               <div className='text-[#363636]'>
