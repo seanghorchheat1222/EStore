@@ -22,6 +22,7 @@ import Setting from './pages/system/Setting'
 import Shipping from './pages/system/Shipping'
 import Signup from './auth/Signup'
 import ResetPassword from './auth/ResetPassword'
+import ProductDetail from './pages/system/ProductDetail'
 
 function App() {
   return (
@@ -34,6 +35,7 @@ function App() {
                 <Route path='' element={<Dashboard></Dashboard>}></Route>
                 <Route path='quickorder' element={<QuickOrder></QuickOrder>}></Route>
                 <Route path='products' element={<Product></Product>}></Route>
+                <Route path='productdetail/:id' element={<ProductDetail></ProductDetail>}></Route>
                 <Route path='categories' element={<Category></Category>}></Route>
                 <Route path='brands' element={<Brand></Brand>}></Route>
                 <Route path='records' element={<Record></Record>}></Route>

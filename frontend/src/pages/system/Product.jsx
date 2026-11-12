@@ -1,8 +1,10 @@
 import React, { useEffect, useState } from 'react'
-import { listBrand, listCategory, listProduct } from '../../services/system/product';
+import { createProduct, deleteProduct, listBrand, listCategory, listProduct } from '../../services/system/product';
+import DeleteIcon from '../../components/ui/DeleteIcon';
+import { useNavigate } from 'react-router-dom';
 
 function Product() {
-
+  const navigate = useNavigate()
   const [isloadingPage, setIsLoadingPage] = useState(false)
   const [isFormOpen, setIsFormOpen] = useState(false);
   const [products, setProduct] = useState([]);
@@ -19,8 +21,27 @@ function Product() {
     description: ''
   })
 
-  const sizes = [{ name: "S" }, { name: "M" }, { name: "L" }, { name: "XL" }, { name: "XXL" }]
-  const colors = [{ name: "red" }, { name: "blue" }, { name: "black" }, { name: "gray" }, { name: "green" }]
+  const [imagePreviews, setImagePreview] = useState([]);
+
+  const sizes = [
+    { id: 1, name: "S", checked: false },
+    { id: 2, name: "M", checked: false },
+    { id: 3, name: "L", checked: false },
+    { id: 4, name: "XL", checked: false },
+    { id: 5, name: "XXL", checked: false }
+  ]
+
+
+  const colors = [
+    { id: 1, name: "red", checked: false },
+    { id: 2, name: "blue", checked: false },
+    { id: 3, name: "black", checked: false },
+    { id: 4, name: "gray", checked: false },
+    { id: 5, name: "green", checked: false },
+  ];
+
+  const [sizeForms, setSizeForm] = useState([]);
+  const [colorForms, setColorForm] = useState([]);
 
   useEffect(() => {
     fetchData()
@@ -64,23 +85,112 @@ function Product() {
     setIsFormOpen(true)
   }
 
+  const handleAddSize = (Id) => {
+    const sizeAlreadyAdd = sizeForms.some((sizeform) => sizeform.id === Id);
+    if (sizeAlreadyAdd) {
+      const finalsizeForms = sizeForms.filter((sizeform) => sizeform.id !== Id)
+      setSizeForm([...finalsizeForms])
+    } else {
+      const findSize = sizes.find((sizeform) => sizeform.id === Id);
+      findSize.checked = !findSize.checked
+      const finalSize = sizes.find((size) => size.checked === true)
+      setSizeForm([...sizeForms, finalSize])
+    }
+  }
 
+  const handleAddColor = (Id) => {
+    const colorAlreadyAdd = colorForms.some((colorform) => colorform.id === Id);
+    if (colorAlreadyAdd) {
+      const finalcolorForms = colorForms.filter((colorform) => colorform.id !== Id)
+      setColorForm([...finalcolorForms])
+    } else {
+      const findColor = colors.find((colorform) => colorform.id === Id);
+      findColor.checked = !findColor.checked
+      const finalColor = colors.find((color) => color.checked === true)
+      setColorForm([...colorForms, finalColor])
+    }
+  }
+
+  const handleImageInput = (e) => {
+    const file = e.target.files[0];
+    const eachimagePreview = file ? URL.createObjectURL(file) : '';
+    const image = {
+      image: file,
+      image_preview: eachimagePreview
+    }
+    setImagePreview([...imagePreviews, image])
+    console.log([...imagePreviews, image])
+  }
+
+  const handleDeleteImage = (i) => {
+    const resultImagePreview = imagePreviews.filter((imagePreview, index) => index !== i)
+    setImagePreview(resultImagePreview)
+  }
 
   const handleAdd = async (e) => {
     e.preventDefault();
-    console.log(form)
 
+    // REMEMBER = normal object, request with body
+    //            object/array inside FormData, has to manual convert form JSON string into JSON first " JSON.stringify() "
+
+    try {
+      setIsLoadingPage(true)
+      const formdata = new FormData();
+      formdata.append('brand_id', form.brand_id);
+      formdata.append('category_id', form.category_id);
+      formdata.append('name', form.name);
+      formdata.append('price', form.price);
+      formdata.append('stock', form.stock);
+
+      if (sizeForms.length !== 0) {
+        sizeForms.forEach((sizeform, index) =>
+          formdata.append(`productsizes[${index}][name]`, sizeform.name)
+        )
+      }
+
+      if (colorForms.length !== 0) {
+        colorForms.forEach((colorform, index) =>
+          formdata.append(`productcolors[${index}][name]`, colorform.name)
+        )
+      }
+
+      if (imagePreviews.length !== 0) {
+        imagePreviews.forEach((imagePreview, index) => {
+          formdata.append(`productimages[${index}][image]`, imagePreview.image)
+        }
+        )
+      }
+
+      const response = await createProduct(formdata)
+      
+      console.log(response.data.data)
+    } catch (err) {
+      console.log(err)
+      console.log(err.response.data.errors)
+    } finally {
+      setIsLoadingPage(false)
+      fetchData()
+      isFormOpen(false)
+    }
 
   }
 
   const handleShow = async (id) => {
-
+    navigate(`/admin/productdetail/${id}`)
   }
 
 
 
   const handleDelete = async (id) => {
-
+    try {
+      setIsLoadingPage(true)
+      await deleteProduct(id)
+    } catch (err) {
+      console.log(err)
+    } finally {
+      setIsLoadingPage(false)
+      fetchData()
+    }
   }
 
   return (
@@ -96,9 +206,9 @@ function Product() {
           :
           <>
 
-            <div className='flex justify-between items-center'>
+            <div className='flex justify-between items-start'>
               <div className='font-semibold'>Product</div>
-              <div className='mt-5'>
+              <div className=''>
                 <button className='cursor-pointer bg-[#040404]   w-max h-11 justify-center items-center rounded-full px-5 shrink-0 flex text-[#FFFFFF] font-semibold' type='submit' onClick={() => onAddOpen()}>
                   Add new product
                 </button>
@@ -125,15 +235,15 @@ function Product() {
                       <tr key={product.id} className='h-15 border-b-2 border-[#040404]'>
                         <td className='text-center px-2'>{product.id}</td>
                         <td className='text-center px-2 whitespace-nowrap'>{product.name}</td>
-                        <td className='text-center px-2'>{product?.brand?.name}</td>
-                        <td className='text-center px-2'>{product?.category?.name}</td>
-                        <td className='text-center px-2'>{product?.inventory?.stock}</td>
-                        <td className='text-center line-clamp-3'>{product.description}</td>
+                        <td className='text-center px-2 whitespace-nowrap'>{product?.brand?.name}</td>
+                        <td className='text-center px-2 whitespace-nowrap'>{product?.category?.name}</td>
+                        <td className='text-center px-2 whitespace-nowrap'>{product?.inventory?.stock}</td>
+                        <td className='text-center line-clamp-3 whitespace-nowrap'>{product.description}</td>
                         <td className='text-center px-2'>{product.is_active ? 'active' : 'in-active'}</td>
                         <td className='px-2'>
                           <div className='flex justify-center items-center gap-2'>
                             <button className='cursor-pointer border border-[#040404] bg-transparent w-max h-8 justify-center items-center rounded-full px-5 shrink-0 flex text-[#363636] font-semibold' type='button' onClick={() => handleShow(product.id)}>
-                              Edit
+                              Detail
                             </button>
                             <button className='cursor-pointer ] bg-[#040404] w-max h-8 justify-center items-center rounded-full px-5 shrink-0 flex text-[#FFFFFF] font-semibold' type='button' onClick={() => handleDelete(product.id)}>
                               Delete
@@ -238,7 +348,7 @@ function Product() {
                               <div className='flex gap-2 w-15 h-7 items-center '>
                                 <div className='w-max h-max'>{size.name}</div>
                                 <div className=' h-max flex items-center'>
-                                  <input placeholder='Enter price' type="checkbox" name="name" value={form?.name} onChange={handleInput} className='placeholder:text-[#363636] h-5 w-5 border-2  outline-0 pl-4 rounded-full border-[#040404]' />
+                                  <input placeholder='Enter price' type="checkbox" onChange={() => handleAddSize(size.id)} className='placeholder:text-[#363636] h-5 w-5 border-2  outline-0 pl-4 rounded-full border-[#040404]' />
                                 </div>
                               </div>
                             )
@@ -255,7 +365,7 @@ function Product() {
                               <div className='flex gap-2 w-20 h-7 items-center'>
                                 <div className='w-max h-max'>{color.name}</div>
                                 <div className=' h-max flex items-center'>
-                                  <input placeholder='Enter price' type="checkbox" name="name" value={form?.name} onChange={handleInput} className='placeholder:text-[#363636] h-5 w-5 border-2  outline-0 pl-4 rounded-full border-[#040404]' />
+                                  <input placeholder='Enter price' type="checkbox" name="name" onChange={() => handleAddColor(color.id)} className='placeholder:text-[#363636] h-5 w-5 border-2  outline-0 pl-4 rounded-full border-[#040404]' />
                                 </div>
                               </div>
                             )
@@ -270,19 +380,37 @@ function Product() {
                           <label htmlFor="">Image*</label>
                         </div>
                         <div className='flex justify-end'>
-                          <button className='cursor-pointer ] bg-[#040404] w-max h-8 justify-center items-center rounded-full px-5 shrink-0 flex text-[#FFFFFF] font-semibold' type='button' >
+                          <button className='cursor-pointer ] bg-[#040404] w-max h-8 justify-center items-center rounded-full px-5 shrink-0 flex text-[#FFFFFF] font-semibold relative' type='button' >
+                            <input type="file" className='absolute w-full h-full opacity-0 cursor-pointer' onChange={handleImageInput} />
                             Add image
                           </button>
                         </div>
                       </div>
 
-                      <div placeholder='Enter brand description' type="text" name="description" value={form?.description} onChange={handleInput} className='placeholder:text-[#363636] h-21 border-2 pt-1  outline-0 pl-4 rounded-xl border-[#040404]'></div>
+                      <div type="text" name="description" className=' h-auto border-2 outline-0 rounded-xl border-[#040404] p-4'>
+                        <div className='grid grid-cols-2 md:grid-cols-3 gap-3'>
+                          {
+                            imagePreviews.map((imagePreview, index) =>
+                              <div key={index} className='w-full h-50 rounded-md border-[#040404] border-2 relative'>
+                                <button className='cursor-pointer bg-[#040404] w-11 h-11 flex justify-center items-center rounded-full shrink-0 absolute -right-3 -top-3' type='button' onClick={() => handleDeleteImage(index)}>
+                                  <div className='w-4 h-4'>
+                                    <DeleteIcon className={"fill-[#FFFFFF] w-full h-full"}>
+                                    </DeleteIcon>
+                                  </div>
+                                </button>
+                                <img src={imagePreview.image_preview} alt="" className='object-cover w-full h-full rounded-md' />
+                              </div>
+                            )
+                          }
+                        </div>
+                      </div>
                     </div>
 
                     <div className='flex gap-1 mt-3 flex-col'>
                       <label htmlFor="">Descrption*</label>
                       <textarea placeholder='Enter brand description' type="text" name="description" value={form?.description} onChange={handleInput} className='placeholder:text-[#363636] h-21 border-2 pt-1  outline-0 pl-4 rounded-xl border-[#040404]' />
                     </div>
+
                     <div className='mt-2 flex justify-end'>
                       <button className='cursor-pointer bg-[#040404]   w-max h-11 justify-center items-center rounded-full px-5 shrink-0 flex text-[#FFFFFF] font-semibold' type='submit' disabled={isloadingPage}>
                         Add

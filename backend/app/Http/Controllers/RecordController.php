@@ -9,7 +9,7 @@ class RecordController extends Controller
 {
     public function listRecord()
     {
-        $query = Order::with(["orderItems", "user"])->latest();
+        $query = Order::with(["orderItems", "user"])->withCount('orderItems')->latest();
 
         $data = $query->paginate(5);
     

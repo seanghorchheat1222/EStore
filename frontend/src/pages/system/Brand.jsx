@@ -129,9 +129,9 @@ function Brand() {
           </div> :
           <>
 
-            <div className='flex justify-between items-center'>
+            <div className='flex justify-between items-start'>
               <div className='font-semibold'>Brand</div>
-              <div className='mt-5'>
+              <div className=''>
                 <button className='cursor-pointer bg-[#040404]   w-max h-11 justify-center items-center rounded-full px-5 shrink-0 flex text-[#FFFFFF] font-semibold' type='submit' onClick={() => onAddOpen()}>
                   Add new brand
                 </button>

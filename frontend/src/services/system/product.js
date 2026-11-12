@@ -11,3 +11,13 @@ export const listCategory = async () => {
 export const listProduct = async (page) => {
   return await api.get(`/product/list_product?page=${page}`)
 }
+
+export const createProduct = async (formData) => {
+  return await api.post(`/product/create_product`, formData)
+}
+
+export const deleteProduct = async (id) => {
+  return await api.delete(`/product/delete_product/${id}`)
+}
+
+

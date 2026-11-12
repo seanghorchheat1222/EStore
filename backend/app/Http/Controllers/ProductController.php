@@ -23,7 +23,7 @@ class ProductController extends Controller
             $query = $query->where("name", "LIKE", '%' . $request->search . '%');
         }
 
-        $data = $query->paginate(5);
+        $data = $query->paginate($request->per_page ?? 5);
 
         return response()->json([
             "status" => true,
@@ -91,8 +91,8 @@ class ProductController extends Controller
                 }
             }
 
-            if ($request->hasFile('productimages')) {
-                foreach ($request->file('productimages') as $productimage) {
+            if ($request->productimages) {
+                foreach ($request->productimages as $productimage) {
 
                     $productImage = new ProductImage();
 
@@ -102,6 +102,7 @@ class ProductController extends Controller
                     $productImage->save();
                 }
             };
+
 
             $product = $product->load(["brand", "category", "inventory", "productSizes", "productColors", "productImages"]);
 
@@ -143,9 +144,9 @@ class ProductController extends Controller
                 'name' => 'required|string|max:100',
                 'price' => 'required',
                 'stock' => 'required',
-                'productsizes' => 'sometimes|array',
-                'productcolors' => 'sometimes|array',
-                'productimages' => 'sometimes|array'
+                'productsizes' => 'sometimes|nullable|array',
+                'productcolors' => 'sometimes|nullable|array',
+                'productimages' => 'sometimes|nullable|array'
             ]);
 
             $productOld = Product::find($request->id);
@@ -179,91 +180,70 @@ class ProductController extends Controller
 
             if ($request->productsizes) {
 
-                foreach ($request->productsizes as $productsize) {
+                $productsizeExit = ProductSize::where('product_id', $request->id);
 
-                    $productsizeExit = ProductSize::where('product_id', $productsize['product_id'])->where('id', $productsize['id'])->first();
+                if ($productsizeExit) {
 
-                    if (!$productsizeExit) {
-
-                        $productSize = new ProductSize();
-
-                        $productSize->product_id = $productOld->id;
-                        $productSize->name = $productsize['name'];
-
-                        $productSize->save();
-
-                    } else {
-
-                        $findProductsizeOldest = ProductSize::find($productsizeExit->id);
-
-                        $findProductsizeOldest->product_id = $productOld->id;
-                        $findProductsizeOldest->name = $productsize['name'];
-
-                        $findProductsizeOldest->update();
-
-                    }
+                    $productsizeExit->delete();
                 }
+
+                foreach ($request->productsizes as $productsize) {
+                    $productSize = new ProductSize();
+
+                    $productSize->product_id = $productOld->id;
+                    $productSize->name = $productsize['name'];
+
+                    $productSize->save();
+
+                }
+
             }
 
 
             if ($request->productcolors) {
- 
+
+                $productcolorExit = ProductColor::where('product_id', $request->id);
+
+                if ($productcolorExit) {
+
+                    $productcolorExit->delete();
+
+                }
+
                 foreach ($request->productcolors as $productcolor) {
+                    $productColor = new ProductColor();
 
-                    $productcolorExit = ProductColor::where('product_id', $productcolor['product_id'])->where('id', $productcolor['id'])->first();
+                    $productColor->product_id = $productOld->id;
+                    $productColor->name = $productcolor['name'];
 
-                    if (!$productcolorExit) {
-
-                        $productColor = new ProductColor();
-
-                        $productColor->product_id = $productOld->id;
-                        $productColor->name = $productcolor['name'];
-
-                        $productColor->save();
-
-                    } else {
-
-                        $findProductcolorOldest = ProductColor::find($productcolorExit->id);
-
-                        $findProductcolorOldest->product_id = $productOld->id;
-                        $findProductcolorOldest->name = $productcolor['name'];
-
-                        $findProductcolorOldest->update();
-
-                    }
-
+                    $productColor->save();
                 }
             }
 
             if ($request->productimages) {
 
+                // $productimageExit = ProductImage::where('product_id', $request->id);
+
+                // if ($productimageExit) {
+
+                //     foreach ($productimageExit as $item) {
+
+                //         if ($item->image_path) {
+                //             Storage::disk('public')->delete($item->image_path);
+                //         }
+                //         $item->delete();
+                //     }
+
+                // }
+
                 foreach ($request->productimages as $productimage) {
 
-                    $productimageExit = ProductImage::where('product_id', $productimage['product_id'])->where('id', $productimage['id'])->first();
+                    $productImage = new ProductImage();
 
-                    if (!$productimageExit) {
+                    $productImage->product_id = $productOld->id;
+                    $productImage->image_path = $productimage['image']?->store('products', 'public');
 
-                        $productImage = new ProductImage();
-
-                        $productImage->product_id = $productOld->id;
-                        $productImage->image_path = $productimage['image']?->store('products', 'public');
-
-                        $productImage->save();
-
-                    } else {
-
-                        $findProductimageOldest = ProductImage::find($productimageExit->id);
-
-                        if ($findProductimageOldest->image_path) {
-                            Storage::disk('public')->delete($findProductimageOldest->image_path);
-                        }
-
-                        $findProductimageOldest->product_id = $productOld->id;
-                        $findProductimageOldest->image_path = $productimage['image']?->store('products', 'public');
-
-                        $findProductimageOldest->update();
-
-                    }
+                    $productImage->save();
 
                 }
             }
@@ -293,10 +273,10 @@ class ProductController extends Controller
 
         $product = $product->load(["brand", "category", "inventory", "productSizes", "productColors", "productImages"]);
 
-        foreach($product->productImages as $product_image){
-           if($product_image->image_path){
+        foreach ($product->productImages as $product_image) {
+            if ($product_image->image_path) {
                 Storage::disk('public')->delete($product_image->image_path);
-           }
+            }
         }
 
         $product->delete();
