@@ -70,6 +70,7 @@ function Category() {
       setIsLoadingPage(false)
       setIsAdd(true)
       fetchData();
+      setIsFormOpen(false)
     }
   }
 
@@ -101,6 +102,7 @@ function Category() {
     } finally {
       setIsLoadingPage(false)
       fetchData()
+      setIsFormOpen(false)
     }
   }
 

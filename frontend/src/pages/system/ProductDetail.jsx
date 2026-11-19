@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 import DeleteIcon from '../../components/ui/DeleteIcon';
-import { deleteProductImage, listBrand, listCategory, showProduct, updateProduct } from '../../services/system/productdetail';
+import { deleteProductImage, isActiveProduct, listBrand, listCategory, showProduct, updateProduct } from '../../services/system/productdetail';
 import DoneIcon from '../../components/ui/DoneIcon';
 
 function ProductDetail() {
@@ -174,14 +174,27 @@ function ProductDetail() {
     } catch (err) {
       console.log(err)
     } finally {
-       setIsLoadingPage(false)
-       setIsEdit(false)
-       fetchData()
+      setIsLoadingPage(false)
+      setIsEdit(false)
+      fetchData()
     }
   }
 
   const toProduct = () => {
     navigate('/admin/products')
+  }
+
+
+  const onIsActiveProduct = async () => {
+    try {
+      setIsLoadingPage(true);
+      await isActiveProduct(id);
+    } catch (err) {
+      console.log(err)
+    } finally {
+      setIsLoadingPage(false)
+      fetchData();
+    }
   }
 
   return (
@@ -358,7 +371,7 @@ function ProductDetail() {
                             return <div className='flex gap-2 w-20 h-7 items-center'>
                               <div className='w-max h-max'>{color.name}</div>
                               <div className=' h-max flex items-center'>
-                                <input   type="checkbox" onChange={() => handleAddColor(color.id)} className='placeholder:text-[#363636] h-5 w-5 border-2  outline-0 pl-4 rounded-full border-[#040404]' />
+                                <input type="checkbox" onChange={() => handleAddColor(color.id)} className='placeholder:text-[#363636] h-5 w-5 border-2  outline-0 pl-4 rounded-full border-[#040404]' />
                               </div>
                             </div>
                           }
@@ -376,7 +389,7 @@ function ProductDetail() {
                             product?.product_colors?.map((color) => {
                               return <div className='flex gap-2 w-20 h-7 items-center'>
                                 <div className='w-max h-max'>{color.name}</div>
-                                   <div className=' flex items-center h-5 w-5 border-2 border-[#040404] bg-[#] rounded-sm'>
+                                <div className=' flex items-center h-5 w-5 border-2 border-[#040404] bg-[#] rounded-sm'>
                                   <div>
                                     <DoneIcon className={'fill-[#363636] w-full h-full'}>
                                     </DoneIcon>
@@ -430,6 +443,17 @@ function ProductDetail() {
                   <label htmlFor="">Descrption*</label>
                   <textarea placeholder='Enter brand description' type="text" name="description" value={form?.description} onChange={handleInput} className='placeholder:text-[#363636] h-21 border-2 pt-1  outline-0 pl-4 rounded-xl border-[#040404]' />
                 </div>
+
+                <div className='flex  w-full min-h-11 items-center justify-end mt-3'>
+
+                  <div className='flex gap-2 w-20 h-7 items-center'>
+                    <div className='w-max h-max'>Status*</div>
+                    <div className=' h-max flex items-center'>
+                      <input type="checkbox" checked={product.is_active === 1} onChange={() => onIsActiveProduct()} className='placeholder:text-[#363636] h-5 w-5 border-2  outline-0 pl-4 rounded-full border-[#040404]' />
+                    </div>
+                  </div>
+                </div>
+
               </form>
             </div>
           </>

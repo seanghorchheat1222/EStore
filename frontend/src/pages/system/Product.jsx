@@ -33,11 +33,11 @@ function Product() {
 
 
   const colors = [
-    { id: 1, name: "red", checked: false },
-    { id: 2, name: "blue", checked: false },
-    { id: 3, name: "black", checked: false },
-    { id: 4, name: "gray", checked: false },
-    { id: 5, name: "green", checked: false },
+    { id: 1, name: "white", checked: false },
+    { id: 2, name: "black", checked: false },
+    { id: 3, name: "gray", checked: false },
+    { id: 4, name: "blue", checked: false },
+    { id: 5, name: "red", checked: false },
   ];
 
   const [sizeForms, setSizeForm] = useState([]);
@@ -64,6 +64,7 @@ function Product() {
       const dataCategory = responseCategory.data.data.data;
       setPaginate(pagination)
       setProduct(data);
+      console.log(data)
       setBrand(dataBrand);
       setCategory(dataCategory);
     } catch (err) {
@@ -155,22 +156,30 @@ function Product() {
       }
 
       if (imagePreviews.length !== 0) {
-        imagePreviews.forEach((imagePreview, index) => {
+        imagePreviews.forEach((imagePreview, index) =>
           formdata.append(`productimages[${index}][image]`, imagePreview.image)
-        }
         )
       }
 
       const response = await createProduct(formdata)
-      
-      console.log(response.data.data)
     } catch (err) {
       console.log(err)
       console.log(err.response.data.errors)
     } finally {
       setIsLoadingPage(false)
       fetchData()
-      isFormOpen(false)
+      setIsFormOpen(false)
+      setForm({
+        brand_id: '',
+        category_id: '',
+        name: '',
+        price: '',
+        stock: '',
+        description: ''
+      })
+      setColorForm([])
+      setSizeForm([])
+      setImagePreview([])
     }
 
   }

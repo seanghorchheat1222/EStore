@@ -10,6 +10,7 @@ use App\Http\Controllers\ProductImageController;
 use App\Http\Controllers\ProductSizeController;
 use App\Http\Controllers\RecordController;
 use App\Http\Controllers\SettingController;
+use App\Http\Controllers\ShippingController;
 use App\Http\Controllers\UserController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
@@ -44,6 +45,7 @@ Route::middleware(['auth:sanctum', 'can:admin'])->group(function () {
         Route::post('/create_product', [ProductController::class, "createProduct"]);
         Route::put('/update_product/{id}', [ProductController::class, "updateProduct"]);
         Route::delete('/delete_product/{id}', [ProductController::class, "deleteProduct"]);
+        Route::put('/isactive_product/{id}', [ProductController::class, "isActiveProduct"]);
     });
 
     Route::prefix('productcolor')->group(function () {
@@ -61,6 +63,10 @@ Route::middleware(['auth:sanctum', 'can:admin'])->group(function () {
     Route::prefix('record')->group(function () {
         Route::get('/list_record', [RecordController::class, 'listRecord']);
         Route::get('/show_record/{id}', [RecordController::class, 'showRecord']);
+    });
+
+    Route::prefix('shipping')->group(function (){
+        Route::get('/list_shipping', [ShippingController::class, 'listShipping']);
     });
 
 });

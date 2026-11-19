@@ -51,6 +51,7 @@ function Setting() {
       }
 
       const response = await setSetting(formData)
+      console.log(response)
 
       if (response.status === 200 || response.status === 201) {
         const response = await currentUser();

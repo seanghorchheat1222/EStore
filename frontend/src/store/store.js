@@ -2,6 +2,7 @@ import { combineSlices, configureStore} from "@reduxjs/toolkit"
 import { FLUSH, PAUSE, persistReducer, PERSIST, persistStore, PURGE, REGISTER, REHYDRATE } from "redux-persist"
 import  userSlice  from './userSlice'
 import  tokenSlice  from './tokenSlice'
+import  cartSlice  from './cartSlice'
 
 const customStorage = {
   getItem:(key) => {
@@ -20,12 +21,13 @@ const customStorage = {
 const persisConfig = {
   key: "EStore",
   storage: customStorage,
-  whitelist: ["user", "token"]
+  whitelist: ["user", "token", "cart"]
 }
 
 const rootReduce = combineSlices({
   user: userSlice,
-  token: tokenSlice
+  token: tokenSlice,
+  cart: cartSlice
 })
 
 const persistedReducer = persistReducer(persisConfig, rootReduce);

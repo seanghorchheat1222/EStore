@@ -9,7 +9,7 @@ export const listCategory = async () => {
 }
 
 export const listProduct = async (page) => {
-  return await api.get(`/product/list_product?page=${page}`)
+  return await api.get(`/product/list_product?page=${page}&&category_id=-1`)
 }
 
 export const createProduct = async (formData) => {
@@ -19,5 +19,6 @@ export const createProduct = async (formData) => {
 export const deleteProduct = async (id) => {
   return await api.delete(`/product/delete_product/${id}`)
 }
+
 
 

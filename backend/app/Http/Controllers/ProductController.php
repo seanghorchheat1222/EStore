@@ -7,6 +7,7 @@ use App\Models\Product;
 use App\Models\ProductColor;
 use App\Models\ProductImage;
 use App\Models\ProductSize;
+use Illuminate\Http\Client\Response;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
@@ -19,8 +20,12 @@ class ProductController extends Controller
 
         $query = Product::with(["brand", "category", "inventory", "productSizes", "productColors", "productImages"])->latest();
 
-        if ($request->search) {
-            $query = $query->where("name", "LIKE", '%' . $request->search . '%');
+        if ($request->category_id != -1) {
+            $query = $query->where("category_id", $request->category_id);
+        }
+
+        if($request->is_active){
+            $query = $query->where("is_active", $request->is_active);
         }
 
         $data = $query->paginate($request->per_page ?? 5);
@@ -222,20 +227,6 @@ class ProductController extends Controller
 
             if ($request->productimages) {
 
-                // $productimageExit = ProductImage::where('product_id', $request->id);
-
-                // if ($productimageExit) {
-
-                //     foreach ($productimageExit as $item) {
-
-                //         if ($item->image_path) {
-                //             Storage::disk('public')->delete($item->image_path);
-                //         }
-                //         $item->delete();
-                //     }
-
-                // }
-
                 foreach ($request->productimages as $productimage) {
 
                     $productImage = new ProductImage();
@@ -282,6 +273,35 @@ class ProductController extends Controller
         $product->delete();
 
         return response()->noContent();
+    }
+
+    public function isActiveProduct(Request $request)
+    {
+
+        $product = Product::find($request->id);
+
+        if (!$product) {
+            return response()->json([
+                "status" => false,
+                "message" => "Product not found!"
+            ], 404);
+        }
+
+        if ($product->is_active === 1) {
+
+            $product->is_active = 0;
+
+            $product->update();
+        } else {
+            $product->is_active = 1;
+
+            $product->update();
+        }
+
+        return response()->json([
+            "status" => true,
+            "message" => "Product status update successfully!"
+        ], 200);
     }
 
 }

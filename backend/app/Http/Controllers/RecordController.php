@@ -7,7 +7,7 @@ use Illuminate\Http\Request;
 
 class RecordController extends Controller
 {
-    public function listRecord()
+    public function listRecord(Request $request)
     {
         $query = Order::with(["orderItems", "user"])->withCount('orderItems')->latest();
 
@@ -29,7 +29,7 @@ class RecordController extends Controller
             ], 404);
         }
 
-        $record = $record->load(["orderItems", "user"]);
+        $record = $record->load(["orderItems.product", "user"]);
 
         return response()->json([
             "status" => true,

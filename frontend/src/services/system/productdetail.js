@@ -19,3 +19,7 @@ export const deleteProductImage = async (id) => {
 export const updateProduct = async (id, formData) => {
   return await api.put(`/product/update_product/${id}`, formData)
 }
+
+export const isActiveProduct = async (id) => {
+  return await api.put(`/product/isactive_product/${id}`)
+}
